@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tenants Management - Smart Hostel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-people"></i> Tenants Management</h2>
+            <p class="text-muted">Manage tenants and assign rooms</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if tenants %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Current Room</th>
+                                    <th>Join Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tenant in tenants %}
+                                <tr>
+                                    <td><strong>{{ tenant.user.get_full_name|default:"N/A" }}</strong></td>
+                                    <td>{{ tenant.user.username }}</td>
+                                    <td>{{ tenant.user.email|default:"N/A" }}</td>
+                                    <td>{{ tenant.phone|default:"N/A" }}</td>
+                                    <td>
+                                        {% if tenant.room %}
+                                            <span class="badge bg-primary">{{ tenant.room.room_number }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No Room</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ tenant.join_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'assign_room' tenant.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-door-open"></i> Assign/Change Room
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-people display-1 text-muted"></i>
+                        <p class="text-muted mt-3">No tenants registered yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

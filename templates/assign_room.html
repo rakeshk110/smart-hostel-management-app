@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Assign Room - Smart Hostel{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-door-open"></i> Assign Room to Tenant
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Tenant Information -->
+                    <div class="mb-4">
+                        <h5>Tenant Information</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <table class="table table-borderless mb-0">
+                                    <tr>
+                                        <th width="30%">Name:</th>
+                                        <td><strong>{{ tenant.user.get_full_name|default:tenant.user.username }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Username:</th>
+                                        <td>{{ tenant.user.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email:</th>
+                                        <td>{{ tenant.user.email|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone:</th>
+                                        <td>{{ tenant.phone|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current Room:</th>
+                                        <td>
+                                            {% if tenant.room %}
+                                                <span class="badge bg-primary fs-6">{{ tenant.room.room_number }}</span>
+                                                <small class="text-muted ms-2">(Capacity: {{ tenant.room.capacity }}, Rent: ${{ tenant.room.rent }})</small>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No Room Assigned</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Assignment Form -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.room.id_for_label }}" class="form-label">
+                                <i class="bi bi-door-open"></i> {{ form.room.label }}
+                            </label>
+                            {{ form.room }}
+                            {% if form.room.errors %}
+                                <div class="text-danger small">{{ form.room.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Select a room to assign. Only available rooms (not full) are shown. 
+                                You can also unassign by selecting "No Room".
+                            </small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'tenant_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Save Assignment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

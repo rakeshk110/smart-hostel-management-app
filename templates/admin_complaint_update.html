@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Complaint Status - Smart Hostel{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Update Complaint Status
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Complaint Details</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p><strong>Tenant:</strong> {{ complaint.tenant.user.get_full_name|default:complaint.tenant.user.username }}</p>
+                                <p><strong>Subject:</strong> {{ complaint.subject }}</p>
+                                <p><strong>Message:</strong> {{ complaint.message }}</p>
+                                <p><strong>Current Status:</strong> 
+                                    <span class="badge bg-{% if complaint.status == 'Resolved' %}success{% else %}warning{% endif %}">
+                                        {{ complaint.status }}
+                                    </span>
+                                </p>
+                                <p><strong>Created:</strong> {{ complaint.created_at|date:"F d, Y, g:i A" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Update Status</label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="Pending" {% if complaint.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'admin_complaint_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

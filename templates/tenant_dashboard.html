@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tenant Dashboard - Smart Hostel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-speedometer2"></i> Tenant Dashboard
+            </h2>
+            <p class="text-muted">Welcome, {{ tenant.user.get_full_name|default:tenant.user.username }}!</p>
+        </div>
+    </div>
+
+    <!-- Personal Information Card -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-circle"></i> Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">Name:</th>
+                            <td>{{ tenant.user.get_full_name|default:tenant.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ tenant.user.email|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Room:</th>
+                            <td>
+                                {% if tenant.room %}
+                                    <span class="badge bg-primary fs-6">{{ tenant.room.room_number }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No Room Assigned</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if tenant.room %}
+                        <tr>
+                            <th>Room Rent:</th>
+                            <td><strong>${{ tenant.room.rent }}/month</strong></td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Join Date:</th>
+                            <td>{{ tenant.join_date|date:"F d, Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bill Summary -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Bill Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h3 class="text-success mb-0">${{ total_paid }}</h3>
+                                <small class="text-muted">Total Paid</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-danger mb-0">${{ total_unpaid }}</h3>
+                            <small class="text-muted">Total Unpaid</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'bill_list' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-list-ul"></i> View All Bills
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unpaid Bills -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-circle"></i> Unpaid Bills</h5>
+                </div>
+                <div class="card-body">
+                    {% if unpaid_bills %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bill in unpaid_bills %}
+                                <tr>
+                                    <td><strong>{{ bill.month }}</strong></td>
+                                    <td>${{ bill.amount }}</td>
+                                    <td><span class="badge bg-danger">{{ bill.status }}</span></td>
+                                    <td>{{ bill.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'pay_bill' bill.id %}" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to pay this bill?')">
+                                            <i class="bi bi-credit-card"></i> Pay Now
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">
+                        <i class="bi bi-check-circle"></i> Great! You have no unpaid bills.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bills -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-receipt-cutoff"></i> Recent Bills</h5>
+                </div>
+                <div class="card-body">
+                    {% if bills %}
+                    <div class="list-group">
+                        {% for bill in bills|slice:":5" %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ bill.month }}</h6>
+                                <span class="badge bg-{% if bill.status == 'Paid' %}success{% else %}danger{% endif %}">
+                                    {{ bill.status }}
+                                </span>
+                            </div>
+                            <p class="mb-1">Amount: <strong>${{ bill.amount }}</strong></p>
+                            <small class="text-muted">{{ bill.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'bill_list' %}" class="btn btn-sm btn-outline-info mt-3 w-100">
+                        View All Bills
+                    </a>
+                    {% else %}
+                    <p class="text-muted text-center">No bills found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Complaints -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> My Complaints</h5>
+                </div>
+                <div class="card-body">
+                    {% if complaints %}
+                    <div class="list-group">
+                        {% for complaint in complaints|slice:":5" %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ complaint.subject|truncatewords:5 }}</h6>
+                                <span class="badge bg-{% if complaint.status == 'Resolved' %}success{% else %}warning{% endif %}">
+                                    {{ complaint.status }}
+                                </span>
+                            </div>
+                            <p class="mb-1 text-muted small">{{ complaint.message|truncatewords:10 }}</p>
+                            <small class="text-muted">{{ complaint.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'new_complaint' %}" class="btn btn-sm btn-outline-danger mt-3 w-100">
+                        <i class="bi bi-plus-circle"></i> Submit New Complaint
+                    </a>
+                    {% else %}
+                    <p class="text-muted text-center mb-3">No complaints submitted yet.</p>
+                    <a href="{% url 'new_complaint' %}" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-plus-circle"></i> Submit Complaint
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

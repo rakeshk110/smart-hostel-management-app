@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Smart Hostel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
+            </h2>
+            <p class="text-muted">Welcome, {{ user.get_full_name|default:user.username }}! Manage your hostel efficiently.</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Total Tenants</h6>
+                            <h2 class="mb-0">{{ total_tenants }}</h2>
+                        </div>
+                        <i class="bi bi-people display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Total Rooms</h6>
+                            <h2 class="mb-0">{{ total_rooms }}</h2>
+                        </div>
+                        <i class="bi bi-door-open display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Unpaid Bills</h6>
+                            <h2 class="mb-0">{{ unpaid_bills }}</h2>
+                        </div>
+                        <i class="bi bi-receipt display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Pending Complaints</h6>
+                            <h2 class="mb-0">{{ pending_complaints }}</h2>
+                        </div>
+                        <i class="bi bi-exclamation-triangle display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{% url 'tenant_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-people"></i> Manage Tenants
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'room_create' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-plus-circle"></i> Add New Room
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'admin_bill_create' %}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-receipt"></i> Create Bill
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'room_list' %}" class="btn btn-outline-info w-100">
+                                <i class="bi bi-list-ul"></i> View All Rooms
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'admin_complaint_list' %}" class="btn btn-outline-warning w-100">
+                                <i class="bi bi-exclamation-triangle"></i> View Complaints
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Data Tables -->
+    <div class="row g-4">
+        <!-- Recent Tenants -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Recent Tenants</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_tenants %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Join Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tenant in recent_tenants %}
+                                <tr>
+                                    <td>{{ tenant.user.get_full_name|default:tenant.user.username }}</td>
+                                    <td>
+                                        {% if tenant.room %}
+                                            <span class="badge bg-primary">{{ tenant.room.room_number }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No Room</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ tenant.join_date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No tenants yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Complaints -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Recent Complaints</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_complaints %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tenant</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for complaint in recent_complaints %}
+                                <tr>
+                                    <td>{{ complaint.tenant.user.username }}</td>
+                                    <td>{{ complaint.subject|truncatewords:5 }}</td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ complaint.status }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{% url 'admin_complaint_list' %}" class="btn btn-sm btn-outline-warning mt-2">
+                        View All Complaints
+                    </a>
+                    {% else %}
+                    <p class="text-muted text-center">No pending complaints.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rooms Overview -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-door-open"></i> Rooms Overview</h5>
+                </div>
+                <div class="card-body">
+                    {% if rooms %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Room Number</th>
+                                    <th>Capacity</th>
+                                    <th>Current Tenants</th>
+                                    <th>Rent</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for room in rooms %}
+                                <tr>
+                                    <td><strong>{{ room.room_number }}</strong></td>
+                                    <td>{{ room.capacity }}</td>
+                                    <td>{{ room.tenant_count }}</td>
+                                    <td>${{ room.rent }}</td>
+                                    <td>
+                                        {% if room.tenant_count >= room.capacity %}
+                                            <span class="badge bg-danger">Full</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'room_update' room.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No rooms available. <a href="{% url 'room_create' %}">Create one now</a>.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
