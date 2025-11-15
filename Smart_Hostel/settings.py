@@ -68,7 +68,7 @@ WSGI_APPLICATION = 'Smart_Hostel.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'))}
+        default=os.getenv('DATABASE_URL'))
     # 'default': {
     #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME': 'smart_hostel_db',
@@ -81,7 +81,7 @@ DATABASES = {
     #     },
     # }
 
-
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
